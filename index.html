@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Expense Entry Form</title>
@@ -7,7 +7,7 @@
     body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; }
     label { display: block; margin-top: 10px; }
     input, button { width: 100%; padding: 8px; margin-top: 5px; }
-    button { margin-top: 15px; }
+    button { margin-top: 15px; cursor: pointer; }
     #response { margin-top: 15px; font-weight: bold; }
   </style>
 </head>
@@ -29,30 +29,26 @@
   <p id="response"></p>
 
   <script>
+    // Replace this with your deployed Apps Script Web App URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzTLHVao-sveHAVGxa6g1wekxrVXgUSci7DKKXCNfl_bBnUt22eSCaszxHkkYBS6hlm/exec';
 
     document.getElementById('expenseForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
-      const data = {
-        expdec: this.expdec.value,
-        amt: this.amt.value,
-        dec: this.dec.value
-      };
+      let formData = new FormData();
+      formData.append("expdec", this.expdec.value);
+      formData.append("amt", this.amt.value);
+      formData.append("dec", this.dec.value);
 
-      fetch(scriptURL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-      .then(response => response.text())
-      .then(text => {
-        document.getElementById('response').innerText = '✅ Saved successfully!';
-        this.reset();
-      })
-      .catch(err => {
-        document.getElementById('response').innerText = '❌ Error: ' + err;
-      });
+      fetch(scriptURL, { method: "POST", body: formData })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById("response").innerText = "✅ Data saved!";
+          this.reset();
+        })
+        .catch(error => {
+          document.getElementById("response").innerText = "❌ Error: " + error;
+        });
     });
   </script>
 </body>
