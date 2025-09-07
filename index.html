@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Expense Entry Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; }
+    label { display: block; margin-top: 10px; }
+    input, button { width: 100%; padding: 8px; margin-top: 5px; }
+    button { margin-top: 15px; }
+    #response { margin-top: 15px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Enter Expense</h2>
+  <form id="expenseForm">
+    <label for="expdec">EXPDEC:</label>
+    <input type="text" id="expdec" name="expdec" required>
+
+    <label for="amt">Amount:</label>
+    <input type="number" id="amt" name="amt" required step="any">
+
+    <label for="dec">Description:</label>
+    <input type="text" id="dec" name="dec">
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <p id="response"></p>
+
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzTLHVao-sveHAVGxa6g1wekxrVXgUSci7DKKXCNfl_bBnUt22eSCaszxHkkYBS6hlm/exec';
+
+    document.getElementById('expenseForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const data = {
+        expdec: this.expdec.value,
+        amt: this.amt.value,
+        dec: this.dec.value
+      };
+
+      fetch(scriptURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.text())
+      .then(text => {
+        document.getElementById('response').innerText = '✅ Saved successfully!';
+        this.reset();
+      })
+      .catch(err => {
+        document.getElementById('response').innerText = '❌ Error: ' + err;
+      });
+    });
+  </script>
+</body>
+</html>
