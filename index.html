@@ -1,4 +1,176 @@
+
 <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Expense Tracker Stylish Form</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .card {
+      width: 800px;
+      max-width: 90%;
+      display: flex;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+      background: #fff;
+    }
+    .card .image {
+      flex: 1;
+      background: url('https://i.ibb.co/8r8W6YV/5519ac27-1337-4bd5-942f-a0fc459b2bad.png') center/cover no-repeat;
+    }
+    .card .form-container {
+      flex: 1;
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .form-container h2 {
+      margin-bottom: 25px;
+      color: #333;
+      text-align: center;
+    }
+    .form-container form {
+      display: flex;
+      flex-direction: column;
+    }
+    .form-container input {
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+    .form-container input:focus {
+      border-color: #ff758c;
+      box-shadow: 0 0 5px rgba(255,117,140,0.5);
+      outline: none;
+    }
+    .form-container button {
+      padding: 14px;
+      background: linear-gradient(135deg, #ff758c, #ff7eb3);
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+    .form-container button:hover {
+      background: linear-gradient(135deg, #ff5f7e, #ff66a0);
+      transform: translateY(-2px);
+    }
+    #response {
+      margin-top: 10px;
+      text-align: center;
+      font-weight: bold;
+      color: #333;
+    }
+    .list {
+      margin-top: 20px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .list ul {
+      list-style: none;
+      padding: 0;
+    }
+    .list li {
+      background: #f9f9f9;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-left: 5px solid #ff758c;
+      display: flex;
+      justify-content: space-between;
+      border-radius: 5px;
+    }
+    .amt {
+      font-weight: bold;
+      color: #ff758c;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="image"></div>
+    <div class="form-container">
+      <h2>💰 Expense Tracker</h2>
+      <form id="expenseForm">
+        <input type="text" name="expdec" id="expdec" placeholder="Expense Type" required>
+        <input type="number" name="amt" id="amt" placeholder="Amount" required>
+        <input type="text" name="dec" id="dec" placeholder="Description">
+        <button type="submit">Save Expense</button>
+      </form>
+      <p id="response"></p>
+      <div class="list">
+        <ul id="expenseList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwz7R6GbVnRNe18wCMqJyCiYF6fRSq8Dl4tlq3BC61Nz8vUjPPohiAa9gBA2Sqft18/exec";
+
+    document.getElementById("expenseForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      const form = this;
+      const button = form.querySelector("button");
+      button.disabled = true;
+      button.innerText = "Saving...";
+
+      const expdec = form.expdec.value;
+      const amt = form.amt.value;
+      const dec = form.dec.value;
+
+      let formData = new FormData(form);
+
+      fetch(scriptURL, { method: "POST", body: formData })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById("response").innerText = "✅ Expense Saved!";
+          addToList(expdec, amt, dec);
+          form.reset();
+          button.disabled = false;
+          button.innerText = "Save Expense";
+        })
+        .catch(error => {
+          document.getElementById("response").innerText = "❌ Error: " + error;
+          button.disabled = false;
+          button.innerText = "Save Expense";
+        });
+    });
+
+    function addToList(expdec, amt, dec){
+      const list = document.getElementById("expenseList");
+      const li = document.createElement("li");
+      li.innerHTML = `<span>${expdec} - ${dec}</span><span class="amt">Rs. ${amt}</span>`;
+      list.prepend(li);
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -180,128 +352,4 @@
 
 
 
-<!-- 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Expense Entry Form</title>
-  <style>
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #4facfe, #00f2fe);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0;
-    }
-    .container {
-      background: #ffffff;
-      padding: 30px 35px;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-      width: 380px;
-      animation: fadeIn 0.6s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #333;
-    }
-    label {
-      font-weight: 600;
-      margin: 8px 0 5px;
-      display: block;
-      color: #444;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-      margin-bottom: 15px;
-      transition: 0.3s;
-    }
-    input:focus {
-      border-color: #4facfe;
-      outline: none;
-      box-shadow: 0 0 5px rgba(79,172,254,0.5);
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #4facfe, #00c6ff);
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: linear-gradient(135deg, #3a8dde, #00a3cc);
-    }
-    #response {
-      text-align: center;
-      font-weight: bold;
-      margin-top: 15px;
-      color: #333;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>💰 Expense Form</h2>
-    <form id="expenseForm">
-      <label for="expdec">EXPDEC</label>
-      <input type="text" name="expdec" id="expdec" placeholder="Enter expense type" required>
-
-      <label for="amt">Amount</label>
-      <input type="number" name="amt" id="amt" placeholder="Enter amount" required>
-
-      <label for="dec">Description</label>
-      <input type="text" name="dec" id="dec" placeholder="Enter description">
-
-      <button type="submit">Save Expense</button>
-    </form>
-    <p id="response"></p>
-  </div>
-
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwz7R6GbVnRNe18wCMqJyCiYF6fRSq8Dl4tlq3BC61Nz8vUjPPohiAa9gBA2Sqft18/exec";
-
-    document.getElementById("expenseForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const form = this;
-      const button = form.querySelector("button");
-      button.disabled = true;
-      button.innerText = "Saving...";
-
-      let formData = new FormData(form);
-
-      fetch(scriptURL, { method: "POST", body: formData })
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById("response").innerText = "✅ Expense Saved!";
-          form.reset(); // clear form after save
-          button.disabled = false;
-          button.innerText = "Save Expense";
-        })
-        .catch(error => {
-          document.getElementById("response").innerText = "❌ Error: " + error;
-          button.disabled = false;
-          button.innerText = "Save Expense";
-        });
-    });
-  </script>
-</body>
-</html>
  -->
