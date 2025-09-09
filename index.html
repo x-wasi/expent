@@ -108,7 +108,7 @@
         .then(response => response.json())
         .then(data => {
           document.getElementById("response").innerText = "✅ Expense Saved!";
-          form.reset();
+          form.reset(); // clear form after save
           button.disabled = false;
           button.innerText = "Save Expense";
         })
