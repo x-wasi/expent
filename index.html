@@ -5,66 +5,86 @@
   <title>Expense Entry Form</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f9;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      margin: 0;
     }
     .container {
-      background: white;
-      padding: 25px 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-      width: 350px;
+      background: #ffffff;
+      padding: 30px 35px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      width: 380px;
+      animation: fadeIn 0.6s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     h2 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      color: #333;
     }
     label {
+      font-weight: 600;
+      margin: 8px 0 5px;
       display: block;
-      margin: 10px 0 5px;
-      font-weight: bold;
+      color: #444;
     }
-    input, button {
+    input {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border-radius: 5px;
+      padding: 12px;
+      border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 14px;
+      margin-bottom: 15px;
+      transition: 0.3s;
+    }
+    input:focus {
+      border-color: #4facfe;
+      outline: none;
+      box-shadow: 0 0 5px rgba(79,172,254,0.5);
     }
     button {
-      background: #28a745;
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #4facfe, #00c6ff);
       color: white;
-      border: none;
-      cursor: pointer;
       font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
     }
     button:hover {
-      background: #218838;
+      background: linear-gradient(135deg, #3a8dde, #00a3cc);
     }
     #response {
       text-align: center;
       font-weight: bold;
-      margin-top: 10px;
+      margin-top: 15px;
+      color: #333;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Expense Form</h2>
+    <h2>💰 Expense Form</h2>
     <form id="expenseForm">
       <label for="expdec">EXPDEC</label>
-      <input type="text" name="expdec" id="expdec" required>
+      <input type="text" name="expdec" id="expdec" placeholder="Enter expense type" required>
 
       <label for="amt">Amount</label>
-      <input type="number" name="amt" id="amt" required>
+      <input type="number" name="amt" id="amt" placeholder="Enter amount" required>
 
       <label for="dec">Description</label>
-      <input type="text" name="dec" id="dec">
+      <input type="text" name="dec" id="dec" placeholder="Enter description">
 
       <button type="submit">Save Expense</button>
     </form>
@@ -77,16 +97,25 @@
     document.getElementById("expenseForm").addEventListener("submit", function(e) {
       e.preventDefault();
 
-      let formData = new FormData(this);
+      const form = this;
+      const button = form.querySelector("button");
+      button.disabled = true;
+      button.innerText = "Saving...";
+
+      let formData = new FormData(form);
 
       fetch(scriptURL, { method: "POST", body: formData })
         .then(response => response.json())
         .then(data => {
           document.getElementById("response").innerText = "✅ Expense Saved!";
-          this.reset();
+          form.reset();
+          button.disabled = false;
+          button.innerText = "Save Expense";
         })
         .catch(error => {
           document.getElementById("response").innerText = "❌ Error: " + error;
+          button.disabled = false;
+          button.innerText = "Save Expense";
         });
     });
   </script>
