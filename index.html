@@ -2,537 +2,853 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Expense Tracker Stylish Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Expense Tracker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a0ca3;
+      --secondary: #4cc9f0;
+      --success: #06ffa5;
+      --danger: #ff006e;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      --transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Background Image with Blur */
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('f9a17a01-7273-46a1-b355-f0e615483e04.png') center/cover no-repeat;
-      filter: blur(10px) brightness(0.7);
-      z-index: -1;
-    }
-
-    .card {
-      width: 800px;
-      max-width: 95%;
-      display: flex;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(5px);
-      animation: fadeIn 0.6s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .card .form-container {
-      flex: 1;
-      padding: 40px 30px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .form-container h2 {
-      margin-bottom: 25px;
-      color: #333;
-      text-align: center;
-    }
-    .form-container form {
-      display: flex;
-      flex-direction: column;
-    }
-    .form-container input {
-      padding: 12px 15px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-      transition: 0.3s;
-    }
-    .form-container input:focus {
-      border-color: #4facfe;
-      box-shadow: 0 0 5px rgba(79,172,254,0.5);
-      outline: none;
-    }
-    .form-container button {
-      padding: 14px;
-      background: linear-gradient(135deg, #4facfe, #00f2fe);
-      color: white;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: 0.3s;
-    }
-    .form-container button:hover {
-      background: linear-gradient(135deg, #3a8dde, #00a3cc);
-      transform: translateY(-2px);
-    }
-    #response {
-      margin-top: 10px;
-      text-align: center;
-      font-weight: bold;
-      color: #333;
-    }
-    .list {
-      margin-top: 20px;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-    .list ul {
-      list-style: none;
-      padding: 0;
-    }
-    .list li {
-      background: #f9f9f9;
-      padding: 10px;
-      margin-bottom: 8px;
-      border-left: 5px solid #4facfe;
-      display: flex;
-      justify-content: space-between;
-      border-radius: 5px;
-    }
-    .amt {
-      font-weight: bold;
-      color: #28a745;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="form-container">
-      <h2>💰 Expense Tracker</h2>
-      <form id="expenseForm">
-        <input type="text" name="expdec" id="expdec" placeholder="Expense Type" required>
-        <input type="number" name="amt" id="amt" placeholder="Amount" required>
-        <input type="text" name="dec" id="dec" placeholder="Description">
-        <button type="submit">Save Expense</button>
-      </form>
-      <p id="response"></p>
-      <div class="list">
-        <ul id="expenseList"></ul>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwz7R6GbVnRNe18wCMqJyCiYF6fRSq8Dl4tlq3BC61Nz8vUjPPohiAa9gBA2Sqft18/exec";
-
-    document.getElementById("expenseForm").addEventListener("submit", function(e){
-      e.preventDefault();
-      const form = this;
-      const button = form.querySelector("button");
-      button.disabled = true;
-      button.innerText = "Saving...";
-
-      const expdec = form.expdec.value;
-      const amt = form.amt.value;
-      const dec = form.dec.value;
-
-      let formData = new FormData(form);
-
-      fetch(scriptURL, { method: "POST", body: formData })
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById("response").innerText = "✅ Expense Saved!";
-          addToList(expdec, amt, dec);
-          form.reset();
-          button.disabled = false;
-          button.innerText = "Save Expense";
-        })
-        .catch(error => {
-          document.getElementById("response").innerText = "❌ Error: " + error;
-          button.disabled = false;
-          button.innerText = "Save Expense";
-        });
-    });
-
-    function addToList(expdec, amt, dec){
-      const list = document.getElementById("expenseList");
-      const li = document.createElement("li");
-      li.innerHTML = `<span>${expdec} - ${dec}</span><span class="amt">Rs. ${amt}</span>`;
-      list.prepend(li);
-    }
-  </script>
-</body>
-</html>
-
-
-
-
-
-<!-- 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Expense Tracker Stylish Form</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .card {
-      width: 800px;
-      max-width: 90%;
-      display: flex;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-      background: #fff;
-    }
-    .card .image {
-      flex: 1;
-      background: url('https://i.ibb.co/8r8W6YV/5519ac27-1337-4bd5-942f-a0fc459b2bad.png') center/cover no-repeat;
-    }
-    .card .form-container {
-      flex: 1;
-      padding: 40px 30px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .form-container h2 {
-      margin-bottom: 25px;
-      color: #333;
-      text-align: center;
-    }
-    .form-container form {
-      display: flex;
-      flex-direction: column;
-    }
-    .form-container input {
-      padding: 12px 15px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-      transition: 0.3s;
-    }
-    .form-container input:focus {
-      border-color: #ff758c;
-      box-shadow: 0 0 5px rgba(255,117,140,0.5);
-      outline: none;
-    }
-    .form-container button {
-      padding: 14px;
-      background: linear-gradient(135deg, #ff758c, #ff7eb3);
-      color: white;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: 0.3s;
-    }
-    .form-container button:hover {
-      background: linear-gradient(135deg, #ff5f7e, #ff66a0);
-      transform: translateY(-2px);
-    }
-    #response {
-      margin-top: 10px;
-      text-align: center;
-      font-weight: bold;
-      color: #333;
-    }
-    .list {
-      margin-top: 20px;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-    .list ul {
-      list-style: none;
-      padding: 0;
-    }
-    .list li {
-      background: #f9f9f9;
-      padding: 10px;
-      margin-bottom: 8px;
-      border-left: 5px solid #ff758c;
-      display: flex;
-      justify-content: space-between;
-      border-radius: 5px;
-    }
-    .amt {
-      font-weight: bold;
-      color: #ff758c;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="image"></div>
-    <div class="form-container">
-      <h2>💰 Expense Tracker</h2>
-      <form id="expenseForm">
-        <input type="text" name="expdec" id="expdec" placeholder="Expense Type" required>
-        <input type="number" name="amt" id="amt" placeholder="Amount" required>
-        <input type="text" name="dec" id="dec" placeholder="Description">
-        <button type="submit">Save Expense</button>
-      </form>
-      <p id="response"></p>
-      <div class="list">
-        <ul id="expenseList"></ul>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwz7R6GbVnRNe18wCMqJyCiYF6fRSq8Dl4tlq3BC61Nz8vUjPPohiAa9gBA2Sqft18/exec";
-
-    document.getElementById("expenseForm").addEventListener("submit", function(e){
-      e.preventDefault();
-      const form = this;
-      const button = form.querySelector("button");
-      button.disabled = true;
-      button.innerText = "Saving...";
-
-      const expdec = form.expdec.value;
-      const amt = form.amt.value;
-      const dec = form.dec.value;
-
-      let formData = new FormData(form);
-
-      fetch(scriptURL, { method: "POST", body: formData })
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById("response").innerText = "✅ Expense Saved!";
-          addToList(expdec, amt, dec);
-          form.reset();
-          button.disabled = false;
-          button.innerText = "Save Expense";
-        })
-        .catch(error => {
-          document.getElementById("response").innerText = "❌ Error: " + error;
-          button.disabled = false;
-          button.innerText = "Save Expense";
-        });
-    });
-
-    function addToList(expdec, amt, dec){
-      const list = document.getElementById("expenseList");
-      const li = document.createElement("li");
-      li.innerHTML = `<span>${expdec} - ${dec}</span><span class="amt">Rs. ${amt}</span>`;
-      list.prepend(li);
-    }
-  </script>
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Expense Tracker</title>
-  <style>
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #4facfe, #00f2fe);
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 40px 0;
-      margin: 0;
+      align-items: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+      position: relative;
+      overflow-x: hidden;
     }
-    .container {
-      background: #ffffff;
-      padding: 30px 35px;
-      border-radius: 15px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-      width: 420px;
-      animation: fadeIn 0.6s ease;
+    
+    /* Animated background elements */
+    .bg-animation {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
     }
+    
+    .bg-animation span {
+      position: absolute;
+      display: block;
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      animation: move 25s linear infinite;
+      bottom: -150px;
+      border-radius: 50%;
+    }
+    
+    .bg-animation span:nth-child(1) {
+      left: 25%;
+      width: 80px;
+      height: 80px;
+      animation-delay: 0s;
+    }
+    
+    .bg-animation span:nth-child(2) {
+      left: 10%;
+      width: 20px;
+      height: 20px;
+      animation-delay: 2s;
+      animation-duration: 12s;
+    }
+    
+    .bg-animation span:nth-child(3) {
+      left: 70%;
+      width: 20px;
+      height: 20px;
+      animation-delay: 4s;
+    }
+    
+    .bg-animation span:nth-child(4) {
+      left: 40%;
+      width: 60px;
+      height: 60px;
+      animation-delay: 0s;
+      animation-duration: 18s;
+    }
+    
+    .bg-animation span:nth-child(5) {
+      left: 65%;
+      width: 20px;
+      height: 20px;
+      animation-delay: 0s;
+    }
+    
+    .bg-animation span:nth-child(6) {
+      left: 75%;
+      width: 110px;
+      height: 110px;
+      animation-delay: 3s;
+    }
+    
+    @keyframes move {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+        border-radius: 50%;
+      }
+      100% {
+        transform: translateY(-1000px) rotate(720deg);
+        opacity: 0;
+        border-radius: 50%;
+      }
+    }
+    
+    .card {
+      width: 100%;
+      max-width: 900px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      animation: fadeIn 0.8s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
+      from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    h2 {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #333;
-    }
-    label {
-      font-weight: 600;
-      margin: 8px 0 5px;
-      display: block;
-      color: #444;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-      margin-bottom: 15px;
-      transition: 0.3s;
-    }
-    input:focus {
-      border-color: #4facfe;
-      outline: none;
-      box-shadow: 0 0 5px rgba(79,172,254,0.5);
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #4facfe, #00c6ff);
+    
+    .card-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
       color: white;
+      padding: 25px 30px;
+      text-align: center;
+    }
+    
+    .card-header h1 {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    
+    .card-header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+    
+    .card-body {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    
+    .form-container {
+      flex: 1;
+      min-width: 300px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .stats-container {
+      flex: 0 0 300px;
+      background: linear-gradient(135deg, #f5f7fa, #e4e8f0);
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    .form-container h2 {
+      margin-bottom: 25px;
+      color: var(--dark);
+      text-align: center;
+      font-size: 1.8rem;
+    }
+    
+    .form-container form {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .form-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
+    .form-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+    }
+    
+    .form-container input {
+      width: 100%;
+      padding: 14px 15px 14px 45px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
       font-size: 16px;
+      transition: var(--transition);
+      background-color: var(--light);
+    }
+    
+    .form-container input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+      outline: none;
+      background-color: white;
+    }
+    
+    .form-container button {
+      padding: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
       font-weight: bold;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
+      font-size: 16px;
+      transition: var(--transition);
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    button:hover {
-      background: linear-gradient(135deg, #3a8dde, #00a3cc);
-      transform: translateY(-2px);
+    
+    .form-container button:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
     }
+    
+    .form-container button:active {
+      transform: translateY(1px);
+    }
+    
     #response {
+      margin-top: 15px;
       text-align: center;
       font-weight: bold;
-      margin-top: 15px;
-      color: #333;
+      padding: 10px;
+      border-radius: 8px;
+      transition: var(--transition);
     }
+    
+    .success {
+      background-color: rgba(6, 255, 165, 0.2);
+      color: #00a854;
+    }
+    
+    .error {
+      background-color: rgba(255, 0, 110, 0.2);
+      color: #d0004f;
+    }
+    
+    .stats-container h3 {
+      margin-bottom: 20px;
+      color: var(--dark);
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .stat-box {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+    }
+    
+    .stat-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-box h4 {
+      color: var(--gray);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .stat-box p {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
     .list {
-      margin-top: 25px;
+      margin-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      border-radius: 10px;
+      background: white;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     }
-    .list h3 {
-      margin-bottom: 10px;
-      color: #444;
-      text-align: center;
+    
+    .list h4 {
+      padding: 15px 20px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      margin: 0;
+      font-size: 1.1rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
-    ul {
+    
+    .list ul {
       list-style: none;
       padding: 0;
-      margin: 0;
     }
-    li {
-      background: #f9f9f9;
-      margin-bottom: 10px;
-      padding: 12px;
-      border-radius: 8px;
-      border-left: 5px solid #4facfe;
+    
+    .list li {
+      padding: 15px 20px;
+      border-bottom: 1px solid #f0f0f0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 14px;
+      transition: var(--transition);
       animation: slideIn 0.3s ease;
     }
+    
     @keyframes slideIn {
       from { opacity: 0; transform: translateX(-20px); }
       to { opacity: 1; transform: translateX(0); }
     }
-    .amt {
+    
+    .list li:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .list li:last-child {
+      border-bottom: none;
+    }
+    
+    .expense-info {
+      flex: 1;
+    }
+    
+    .expense-type {
       font-weight: bold;
-      color: #28a745;
+      color: var(--dark);
+      margin-bottom: 5px;
+    }
+    
+    .expense-desc {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+    
+    .expense-amount {
+      font-weight: bold;
+      color: var(--primary);
+      font-size: 1.1rem;
+      margin-right: 15px;
+    }
+    
+    .delete-btn {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: var(--transition);
+      padding: 5px;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .delete-btn:hover {
+      background-color: rgba(255, 0, 110, 0.1);
+      transform: scale(1.1);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: var(--gray);
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+    
+    .print-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: var(--transition);
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .print-btn:hover {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+    }
+    
+    /* Print Styles */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      
+      .print-area, .print-area * {
+        visibility: visible;
+      }
+      
+      .print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      
+      .no-print {
+        display: none;
+      }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .card-body {
+        flex-direction: column;
+      }
+      
+      .stats-container {
+        flex: none;
+        background: linear-gradient(135deg, #f5f7fa, #e4e8f0);
+      }
+      
+      .card-header h1 {
+        font-size: 1.8rem;
+      }
+      
+      .form-container h2 {
+        font-size: 1.5rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .card {
+        border-radius: 15px;
+      }
+      
+      .card-header {
+        padding: 20px;
+      }
+      
+      .form-container, .stats-container {
+        padding: 20px;
+      }
+      
+      .stat-box p {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>💰 Expense Tracker</h2>
-    <form id="expenseForm">
-      <label for="expdec">EXPDEC</label>
-      <input type="text" name="expdec" id="expdec" placeholder="Enter expense type" required>
-
-      <label for="amt">Amount</label>
-      <input type="number" name="amt" id="amt" placeholder="Enter amount" required>
-
-      <label for="dec">Description</label>
-      <input type="text" name="dec" id="dec" placeholder="Enter description">
-
-      <button type="submit">Save Expense</button>
-    </form>
-    <p id="response"></p>
-
-    <div class="list">
-      <h3>📋 Recent Entries</h3>
-      <ul id="expenseList"></ul>
+  <div class="bg-animation">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      <h1><i class="fas fa-wallet"></i> Expense Tracker</h1>
+      <p>Track your daily expenses efficiently</p>
+    </div>
+    
+    <div class="card-body">
+      <div class="form-container">
+        <h2><i class="fas fa-plus-circle"></i> Add New Expense</h2>
+        <form id="expenseForm">
+          <div class="form-group">
+            <i class="fas fa-tag"></i>
+            <input type="text" name="expdec" id="expdec" placeholder="Expense Type" required>
+          </div>
+          
+          <div class="form-group">
+            <i class="fas fa-money-bill-wave"></i>
+            <input type="number" name="amt" id="amt" placeholder="Amount" required step="0.01">
+          </div>
+          
+          <div class="form-group">
+            <i class="fas fa-align-left"></i>
+            <input type="text" name="dec" id="dec" placeholder="Description">
+          </div>
+          
+          <button type="submit">
+            <i class="fas fa-save"></i> Save Expense
+          </button>
+        </form>
+        
+        <div id="response"></div>
+      </div>
+      
+      <div class="stats-container">
+        <div>
+          <h3><i class="fas fa-chart-pie"></i> Expense Stats</h3>
+          
+          <div class="stat-box">
+            <h4>Total Expenses</h4>
+            <p id="totalAmount">Rs. 0.00</p>
+          </div>
+          
+          <div class="stat-box">
+            <h4>Transactions</h4>
+            <p id="totalTransactions">0</p>
+          </div>
+        </div>
+        
+        <div class="list">
+          <h4><i class="fas fa-list"></i> Recent Expenses</h4>
+          <ul id="expenseList">
+            <div class="empty-state">
+              <i class="fas fa-receipt"></i>
+              <p>No expenses added yet</p>
+            </div>
+          </ul>
+        </div>
+        
+        <button class="print-btn" onclick="printReport()">
+          <i class="fas fa-print"></i> Print Report
+        </button>
+      </div>
     </div>
   </div>
 
   <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbwz7R6GbVnRNe18wCMqJyCiYF6fRSq8Dl4tlq3BC61Nz8vUjPPohiAa9gBA2Sqft18/exec";
-
-    document.getElementById("expenseForm").addEventListener("submit", function(e) {
+    
+    // Initialize variables
+    let expenses = [];
+    let totalAmount = 0;
+    
+    // DOM elements
+    const expenseForm = document.getElementById("expenseForm");
+    const responseDiv = document.getElementById("response");
+    const expenseList = document.getElementById("expenseList");
+    const totalAmountEl = document.getElementById("totalAmount");
+    const totalTransactionsEl = document.getElementById("totalTransactions");
+    
+    // Form submission
+    expenseForm.addEventListener("submit", function(e) {
       e.preventDefault();
-
-      const form = this;
-      const button = form.querySelector("button");
+      
+      const button = expenseForm.querySelector("button");
       button.disabled = true;
-      button.innerText = "Saving...";
-
-      let formData = new FormData(form);
-      const expdec = form.expdec.value;
-      const amt = form.amt.value;
-      const dec = form.dec.value;
-
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+      
+      const expdec = expenseForm.expdec.value;
+      const amt = parseFloat(expenseForm.amt.value);
+      const dec = expenseForm.dec.value;
+      
+      const formData = new FormData(expenseForm);
+      
       fetch(scriptURL, { method: "POST", body: formData })
         .then(response => response.json())
         .then(data => {
-          document.getElementById("response").innerText = "✅ Expense Saved!";
-          addToList(expdec, amt, dec);
-          form.reset(); // clear form after save
+          showResponse("✅ Expense Saved Successfully!", "success");
+          addExpense(expdec, amt, dec);
+          expenseForm.reset();
           button.disabled = false;
-          button.innerText = "Save Expense";
+          button.innerHTML = '<i class="fas fa-save"></i> Save Expense';
         })
         .catch(error => {
-          document.getElementById("response").innerText = "❌ Error: " + error;
+          showResponse("❌ Error: " + error.message, "error");
           button.disabled = false;
-          button.innerText = "Save Expense";
+          button.innerHTML = '<i class="fas fa-save"></i> Save Expense';
         });
     });
-
-    function addToList(expdec, amt, dec) {
-      const list = document.getElementById("expenseList");
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <span>${expdec} - ${dec}</span>
-        <span class="amt">Rs. ${amt}</span>
-      `;
-      list.prepend(li); // newest entry on top
+    
+    // Show response message
+    function showResponse(message, type) {
+      responseDiv.textContent = message;
+      responseDiv.className = type;
+      
+      setTimeout(() => {
+        responseDiv.textContent = "";
+        responseDiv.className = "";
+      }, 5000);
     }
+    
+    // Add expense to the list and update stats
+    function addExpense(type, amount, description) {
+      const expense = {
+        id: Date.now(),
+        type,
+        amount,
+        description
+      };
+      
+      expenses.push(expense);
+      updateStats();
+      renderExpenses();
+    }
+    
+    // Remove expense from the list
+    function removeExpense(id) {
+      expenses = expenses.filter(expense => expense.id !== id);
+      updateStats();
+      renderExpenses();
+    }
+    
+    // Update statistics
+    function updateStats() {
+      totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+      totalAmountEl.textContent = `Rs. ${totalAmount.toFixed(2)}`;
+      totalTransactionsEl.textContent = expenses.length;
+    }
+    
+    // Render expenses list
+    function renderExpenses() {
+      if (expenses.length === 0) {
+        expenseList.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-receipt"></i>
+            <p>No expenses added yet</p>
+          </div>
+        `;
+        return;
+      }
+      
+      expenseList.innerHTML = expenses
+        .map(expense => `
+          <li>
+            <div class="expense-info">
+              <div class="expense-type">${expense.type}</div>
+              <div class="expense-desc">${expense.description || 'No description'}</div>
+            </div>
+            <div class="expense-amount">Rs. ${expense.amount.toFixed(2)}</div>
+            <button class="delete-btn" onclick="removeExpense(${expense.id})">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </li>
+        `)
+        .join('');
+    }
+    
+    // Print report function
+    function printReport() {
+      if (expenses.length === 0) {
+        showResponse("❌ No expenses to print", "error");
+        return;
+      }
+      
+      // Create a new window for the print report
+      const printWindow = window.open('', '_blank');
+      
+      // Get current date for the report
+      const currentDate = new Date();
+      const formattedDate = currentDate.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      
+      // Generate HTML content for the report
+      let reportHTML = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Expense Report</title>
+          <style>
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              margin: 0;
+              padding: 20px;
+              color: #333;
+            }
+            .report-header {
+              text-align: center;
+              margin-bottom: 30px;
+              border-bottom: 2px solid #4361ee;
+              padding-bottom: 15px;
+            }
+            .report-header h1 {
+              font-size: 2.5rem;
+              color: #4361ee;
+              margin: 0 0 10px 0;
+            }
+            .report-header p {
+              font-size: 1.1rem;
+              margin: 5px 0;
+              color: #666;
+            }
+            .report-summary {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 25px;
+              background: #f8f9fa;
+              padding: 15px;
+              border-radius: 8px;
+            }
+            .report-summary div {
+              text-align: center;
+            }
+            .report-summary h3 {
+              font-size: 1rem;
+              color: #666;
+              margin: 0 0 5px 0;
+              text-transform: uppercase;
+            }
+            .report-summary p {
+              font-size: 1.5rem;
+              font-weight: bold;
+              color: #4361ee;
+              margin: 0;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 30px;
+            }
+            th, td {
+              padding: 12px 15px;
+              text-align: left;
+              border-bottom: 1px solid #ddd;
+            }
+            th {
+              background-color: #4361ee;
+              color: white;
+              font-weight: bold;
+            }
+            tr:nth-child(even) {
+              background-color: #f8f9fa;
+            }
+            .amount {
+              text-align: right;
+              font-weight: bold;
+            }
+            .report-footer {
+              text-align: center;
+              margin-top: 40px;
+              font-size: 0.9rem;
+              color: #666;
+            }
+            @media print {
+              body {
+                padding: 0;
+              }
+              .no-print {
+                display: none;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="report-header">
+            <h1>EXP TRACKER</h1>
+            <p>Expense Report</p>
+            <p>Generated on: ${formattedDate}</p>
+          </div>
+          
+          <div class="report-summary">
+            <div>
+              <h3>Total Expenses</h3>
+              <p>Rs. ${totalAmount.toFixed(2)}</p>
+            </div>
+            <div>
+              <h3>Transactions</h3>
+              <p>${expenses.length}</p>
+            </div>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Expense Type</th>
+                <th>Description</th>
+                <th class="amount">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      // Add each expense to the table
+      expenses.forEach((expense, index) => {
+        reportHTML += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${expense.type}</td>
+            <td>${expense.description || 'No description'}</td>
+            <td class="amount">Rs. ${expense.amount.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+      
+      // Close the HTML
+      reportHTML += `
+            </tbody>
+          </table>
+          
+          <div class="report-footer">
+            <p>This is an automatically generated expense report from EXP TRACKER</p>
+          </div>
+          
+          <div class="no-print" style="text-align: center; margin-top: 30px;">
+            <button onclick="window.print()" style="padding: 10px 20px; background: #4361ee; color: white; border: none; border-radius: 5px; cursor: pointer;">Print Report</button>
+            <button onclick="window.close()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">Close</button>
+          </div>
+        </body>
+        </html>
+      `;
+      
+      // Write the HTML to the new window
+      printWindow.document.write(reportHTML);
+      printWindow.document.close();
+    }
+    
+    // Initialize the app
+    updateStats();
+    renderExpenses();
   </script>
 </body>
 </html>
-
-
-
-
-
- -->
- -->
